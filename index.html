@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Toshi — AI Developer Portfolio</title>
+  <meta name="description" content="Claude Code を活用した AI 自動化エージェント開発の実績をまとめたポートフォリオ。ニュース収集・SEO分析・コンテンツ生成・データ自動化など。">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+  <style>
+    /* ── VARIABLES ── */
+    :root {
+      --bg:            #ffffff;
+      --surface:       #f7f7f7;
+      --text:          #0d0d0d;
+      --text-sub:      #5c5c5c;
+      --text-on-dark:  #ffffff;
+      --border:        #1a1a1a;
+      --border-subtle: #e0e0e0;
+
+      --font: 'Inter', 'Helvetica Neue', 'Hiragino Sans', 'Hiragino Kaku Gothic ProN', sans-serif;
+
+      --hero-size:  clamp(48px, 9vw, 112px);
+      --h1-size:    clamp(32px, 5vw, 60px);
+      --h2-size:    clamp(22px, 3.2vw, 38px);
+      --h3-size:    clamp(16px, 2vw, 22px);
+      --body-size:  16px;
+      --label-size: 11px;
+
+      --xs:  8px;
+      --sm:  16px;
+      --md:  32px;
+      --lg:  64px;
+      --xl:  96px;
+      --xxl: 140px;
+      --gutter: clamp(20px, 4vw, 56px);
+      --max-w: 1280px;
+
+      --duration: 200ms;
+      --ease: ease;
+    }
+
+    /* ── RESET ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: var(--font);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.75;
+      overflow-x: hidden;
+    }
+    img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    a { text-decoration: none; color: inherit; }
+
+    /* ── UTILITY ── */
+    .container {
+      width: 100%;
+      max-width: var(--max-w);
+      margin: 0 auto;
+      padding: 0 var(--gutter);
+    }
+    .label {
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      margin-bottom: var(--xs);
+    }
+    .sr-only {
+      position: absolute; width: 1px; height: 1px;
+      overflow: hidden; clip: rect(0,0,0,0);
+    }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 56px;
+      display: flex; align-items: center;
+      padding: 0 var(--gutter);
+      border-bottom: 1px solid rgba(255,255,255,0.12);
+      transition: background var(--duration) var(--ease),
+                  border-color var(--duration) var(--ease);
+    }
+    nav.scrolled {
+      background: rgba(255,255,255,0.96);
+      border-bottom-color: var(--border-subtle);
+      backdrop-filter: blur(10px);
+    }
+    nav.scrolled .nav-logo,
+    nav.scrolled .nav-links a { color: var(--text); }
+    nav.scrolled .nav-links a:hover { opacity: 0.5; }
+    .nav-logo {
+      font-size: 18px;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      color: var(--text-on-dark);
+      margin-right: auto;
+      transition: color var(--duration);
+    }
+    .nav-links {
+      display: flex; gap: var(--md);
+    }
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-on-dark);
+      transition: opacity var(--duration);
+    }
+    .nav-links a:hover { opacity: 0.6; }
+
+    /* ── HERO ── */
+    .hero {
+      position: relative;
+      height: 100svh;
+      min-height: 600px;
+      display: flex;
+      align-items: flex-end;
+      padding-bottom: var(--xl);
+      overflow: hidden;
+    }
+    .hero-bg {
+      position: absolute; inset: 0;
+      background: #111;
+    }
+    .hero-bg img {
+      opacity: 0.45;
+    }
+    .hero-overlay {
+      position: absolute; inset: 0;
+      background: linear-gradient(
+        105deg,
+        rgba(0,0,0,0.80) 0%,
+        rgba(0,0,0,0.30) 60%,
+        rgba(0,0,0,0.10) 100%
+      );
+    }
+    .hero-content {
+      position: relative; z-index: 1;
+      width: 100%;
+    }
+    .hero-eyebrow {
+      font-size: var(--label-size);
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.55);
+      margin-bottom: var(--sm);
+    }
+    .hero h1 {
+      font-size: var(--hero-size);
+      font-weight: 900;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      color: var(--text-on-dark);
+      max-width: 14ch;
+    }
+    .hero h1 em {
+      font-style: normal;
+      display: block;
+    }
+    .hero-sub {
+      margin-top: var(--md);
+      font-size: clamp(15px, 1.5vw, 18px);
+      color: rgba(255,255,255,0.70);
+      max-width: 480px;
+      line-height: 1.7;
+    }
+    .hero-actions {
+      margin-top: var(--md);
+      display: flex;
+      gap: var(--sm);
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      border: 1.5px solid transparent;
+      transition: background var(--duration), color var(--duration), border-color var(--duration);
+      cursor: pointer;
+    }
+    .btn-primary {
+      background: #ffffff;
+      color: #0d0d0d;
+      border-color: #ffffff;
+    }
+    .btn-primary:hover {
+      background: transparent;
+      color: #ffffff;
+    }
+    .btn-outline {
+      background: transparent;
+      color: #ffffff;
+      border-color: rgba(255,255,255,0.55);
+    }
+    .btn-outline:hover {
+      border-color: #ffffff;
+      background: rgba(255,255,255,0.08);
+    }
+    .hero-scroll {
+      position: absolute;
+      right: var(--gutter);
+      bottom: var(--xl);
+      width: 52px; height: 52px;
+      border: 1.5px solid rgba(255,255,255,0.40);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      color: rgba(255,255,255,0.70);
+      font-size: 18px;
+      transition: border-color var(--duration);
+    }
+    .hero-scroll:hover { border-color: #fff; }
+
+    /* ── SECTION ── */
+    .section { padding: var(--xxl) 0; }
+    .section-sm { padding: var(--xl) 0; }
+    .section-dark {
+      background: #0d0d0d;
+      color: var(--text-on-dark);
+    }
+    .section-dark .label { color: rgba(255,255,255,0.40); }
+    .section-dark .divider-line { border-color: rgba(255,255,255,0.12); }
+
+    .section-header {
+      margin-bottom: var(--lg);
+    }
+    .section-header h2 {
+      font-size: var(--h1-size);
+      font-weight: 900;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+    }
+
+    .divider-line {
+      border: none;
+      border-top: 1px solid var(--border-subtle);
+      margin: 0;
+    }
+
+    /* ── ABOUT ── */
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: var(--lg);
+      align-items: start;
+    }
+    .about-text p {
+      font-size: clamp(15px, 1.5vw, 18px);
+      color: var(--text-sub);
+      line-height: 1.8;
+      margin-bottom: var(--sm);
+    }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+    .skills-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .skill-chip {
+      padding: 6px 14px;
+      border: 1px solid var(--border-subtle);
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-sub);
+      transition: border-color var(--duration), color var(--duration);
+    }
+    .skill-chip:hover {
+      border-color: var(--border);
+      color: var(--text);
+    }
+
+    /* ── WORKS ── */
+    .works-number {
+      font-size: clamp(80px, 12vw, 160px);
+      font-weight: 900;
+      line-height: 1;
+      letter-spacing: -0.04em;
+      color: var(--border-subtle);
+      margin-bottom: -0.2em;
+    }
+    .works-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1px;
+      background: var(--border-subtle);
+      border: 1px solid var(--border-subtle);
+    }
+    .work-card {
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      transition: background var(--duration);
+    }
+    .work-card:hover { background: var(--surface); }
+    .work-img {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      overflow: hidden;
+      background: #f0f0f0;
+    }
+    .work-img img {
+      transition: transform 0.4s ease;
+    }
+    .work-card:hover .work-img img {
+      transform: scale(1.03);
+    }
+    .work-body {
+      padding: var(--md) var(--md) var(--lg);
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    .work-tags {
+      display: flex; gap: 6px; flex-wrap: wrap;
+      margin-bottom: var(--sm);
+    }
+    .work-tag {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.10em;
+      text-transform: uppercase;
+      color: var(--text-sub);
+      border: 1px solid var(--border-subtle);
+      padding: 3px 8px;
+    }
+    .work-title {
+      font-size: var(--h3-size);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      margin-bottom: var(--xs);
+      line-height: 1.3;
+    }
+    .work-desc {
+      font-size: 14px;
+      color: var(--text-sub);
+      line-height: 1.7;
+      flex: 1;
+    }
+    .work-meta {
+      margin-top: var(--md);
+      padding-top: var(--sm);
+      border-top: 1px solid var(--border-subtle);
+      font-size: 12px;
+      color: var(--text-sub);
+      display: flex;
+      align-items: center;
+      gap: var(--xs);
+    }
+    .work-meta span { font-weight: 600; color: var(--text); }
+
+    /* ── PROCESS ── */
+    .process-steps {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1px;
+      background: var(--border-subtle);
+      border: 1px solid var(--border-subtle);
+      margin-top: var(--lg);
+    }
+    .process-step {
+      background: #0d0d0d;
+      padding: var(--md) var(--md) var(--lg);
+    }
+    .step-num {
+      font-size: clamp(40px, 5vw, 64px);
+      font-weight: 900;
+      letter-spacing: -0.03em;
+      color: rgba(255,255,255,0.12);
+      line-height: 1;
+      margin-bottom: var(--md);
+    }
+    .step-title {
+      font-size: var(--h3-size);
+      font-weight: 700;
+      color: var(--text-on-dark);
+      margin-bottom: var(--xs);
+    }
+    .step-desc {
+      font-size: 13px;
+      color: rgba(255,255,255,0.50);
+      line-height: 1.7;
+    }
+
+    /* ── CONTACT ── */
+    .contact-inner {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: var(--lg);
+      align-items: end;
+      padding: var(--xl) 0;
+      border-top: 1px solid var(--border-subtle);
+      border-bottom: 1px solid var(--border-subtle);
+    }
+    .contact-heading {
+      font-size: var(--h1-size);
+      font-weight: 900;
+      letter-spacing: -0.025em;
+      line-height: 1.05;
+    }
+    .contact-actions { display: flex; gap: var(--sm); flex-wrap: wrap; }
+    .btn-dark {
+      background: var(--text);
+      color: var(--bg);
+      border-color: var(--text);
+    }
+    .btn-dark:hover {
+      background: transparent;
+      color: var(--text);
+    }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text);
+      border-color: var(--border-subtle);
+    }
+    .btn-ghost:hover { border-color: var(--text); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: var(--md) 0;
+    }
+    .footer-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: var(--sm);
+    }
+    .footer-logo {
+      font-size: 15px;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+    }
+    .footer-copy {
+      font-size: 12px;
+      color: var(--text-sub);
+    }
+    .footer-links {
+      display: flex;
+      gap: var(--md);
+    }
+    .footer-links a {
+      font-size: 12px;
+      color: var(--text-sub);
+      transition: color var(--duration);
+    }
+    .footer-links a:hover { color: var(--text); }
+
+    /* ── REVEAL ANIMATION ── */
+    .reveal {
+      opacity: 0;
+      transform: translateY(24px);
+      transition: opacity 0.55s ease, transform 0.55s ease;
+    }
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 768px) {
+      .about-grid { grid-template-columns: 1fr; gap: var(--md); }
+      .works-grid  { grid-template-columns: 1fr; }
+      .process-steps { grid-template-columns: 1fr 1fr; }
+      .contact-inner { grid-template-columns: 1fr; }
+      .footer-inner { flex-direction: column; align-items: flex-start; gap: 12px; }
+      .footer-links { flex-wrap: wrap; gap: var(--sm); }
+      .hero-scroll { display: none; }
+    }
+    @media (max-width: 480px) {
+      .process-steps { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ── NAV ── -->
+<nav id="nav">
+  <div class="nav-logo">Toshi.</div>
+  <div class="nav-links">
+    <a href="#about">About</a>
+    <a href="#works">Works</a>
+    <a href="#process">Process</a>
+    <a href="#contact">Contact</a>
+  </div>
+</nav>
+
+<!-- ── HERO ── -->
+<section class="hero" aria-label="ヒーローセクション">
+  <div class="hero-bg">
+    <img src="img_yahoo_news.png" alt="">
+  </div>
+  <div class="hero-overlay"></div>
+
+  <div class="container hero-content">
+    <p class="hero-eyebrow">AI Developer Portfolio</p>
+    <h1>
+      Claude Code で作る
+      <em>AI 自動化</em>
+    </h1>
+    <p class="hero-sub">
+      ニュース収集・SEO分析・コンテンツ生成・データ自動化。<br>
+      エージェント開発の実績をまとめています。
+    </p>
+    <div class="hero-actions">
+      <a href="#works" class="btn btn-primary">実績を見る</a>
+      <a href="#contact" class="btn btn-outline">お問い合わせ</a>
+    </div>
+  </div>
+
+  <a href="#about" class="hero-scroll" aria-label="スクロール">↓</a>
+</section>
+
+<!-- ── ABOUT ── -->
+<section class="section" id="about">
+  <div class="container">
+    <hr class="divider-line">
+    <div style="padding-top: var(--xl);">
+      <div class="section-header reveal">
+        <p class="label">About</p>
+        <h2>使用技術・スキル</h2>
+      </div>
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <p>
+            <strong>Claude Code</strong> を中心とした AI エージェント開発に取り組んでいます。
+            プロンプト設計から SubAgents・Skills・Commands の活用まで、
+            実務で使える自動化を一から構築してきました。
+          </p>
+          <p>
+            Web スクレイピング・SEO 最適化・コンテンツ自動生成・GitHub 連携など、
+            幅広いユースケースで AI を実践的に活用しています。
+          </p>
+        </div>
+        <div class="reveal" style="transition-delay: 80ms">
+          <div class="skills-list">
+            <span class="skill-chip">Claude Code</span>
+            <span class="skill-chip">SubAgents</span>
+            <span class="skill-chip">Skills / Commands</span>
+            <span class="skill-chip">Web スクレイピング</span>
+            <span class="skill-chip">SEO 自動化</span>
+            <span class="skill-chip">Google Sheets 連携</span>
+            <span class="skill-chip">GitHub 連携</span>
+            <span class="skill-chip">コンテンツ自動生成</span>
+            <span class="skill-chip">Markdown</span>
+            <span class="skill-chip">HTML / CSS</span>
+            <span class="skill-chip">Python</span>
+            <span class="skill-chip">プロンプト設計</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── WORKS ── -->
+<section class="section-sm" id="works">
+  <div class="container">
+    <hr class="divider-line">
+    <div style="padding-top: var(--xl);">
+      <div class="section-header reveal">
+        <p class="label">Works</p>
+        <h2>AI 自動化 実績</h2>
+      </div>
+    </div>
+  </div>
+
+  <div class="container" style="padding-bottom: var(--xxl)">
+    <div class="works-grid">
+
+      <!-- Card 1 -->
+      <div class="work-card reveal">
+        <div class="work-img">
+          <img src="img_news_agent.png" alt="ニュース自動収集エージェントのスクリーンショット">
+        </div>
+        <div class="work-body">
+          <div class="work-tags">
+            <span class="work-tag">スクレイピング</span>
+            <span class="work-tag">自動化</span>
+            <span class="work-tag">Claude in Chrome</span>
+          </div>
+          <h3 class="work-title">ニュース自動収集エージェント</h3>
+          <p class="work-desc">
+            Yahoo・NHK・朝日新聞の3サイトを横断してトップニュースの見出しを自動取得し、Google Sheets へ一覧出力。Claude in Chrome MCP を活用したブラウザ自動操作を実装。
+          </p>
+          <div class="work-meta">
+            使用ツール: <span>Claude Code, Chrome MCP, Google Sheets</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="work-card reveal" style="transition-delay: 60ms">
+        <div class="work-img">
+          <img src="img_seo_analysis.png" alt="SEO分析ツールのスクリーンショット">
+        </div>
+        <div class="work-body">
+          <div class="work-tags">
+            <span class="work-tag">SEO</span>
+            <span class="work-tag">分析</span>
+            <span class="work-tag">Skills</span>
+          </div>
+          <h3 class="work-title">SEO 分析 &amp; 改善提案ツール</h3>
+          <p class="work-desc">
+            HTML・Markdown ファイルを入力すると、メタタグ・見出し構造・コンテンツ量・canonical タグを評価し、優先度付きの改善提案を自動生成。独自の SEO スキルとして実装。
+          </p>
+          <div class="work-meta">
+            使用ツール: <span>Claude Code, SEO Skill, Markdown</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 3 -->
+      <div class="work-card reveal" style="transition-delay: 0ms">
+        <div class="work-img">
+          <img src="img_blog_gen.png" alt="SEOブログ記事生成のスクリーンショット">
+        </div>
+        <div class="work-body">
+          <div class="work-tags">
+            <span class="work-tag">コンテンツ生成</span>
+            <span class="work-tag">SubAgents</span>
+            <span class="work-tag">並列処理</span>
+          </div>
+          <h3 class="work-title">SEO ブログ記事 自動生成エージェント</h3>
+          <p class="work-desc">
+            Claude Code の SubAgents を活用し、リサーチ・構成・執筆・文字数検証を並列実行。5,000字・達成率 99.3% の SEO 最適化記事を自動生成することに成功。
+          </p>
+          <div class="work-meta">
+            成果: <span>5,000字 / 達成率 99.3%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="work-card reveal" style="transition-delay: 60ms">
+        <div class="work-img">
+          <img src="img_weather.png" alt="天気予報自動生成のスクリーンショット">
+        </div>
+        <div class="work-body">
+          <div class="work-tags">
+            <span class="work-tag">データ処理</span>
+            <span class="work-tag">GitHub</span>
+            <span class="work-tag">Markdown</span>
+          </div>
+          <h3 class="work-title">天気予報 Markdown 自動生成 &amp; Push</h3>
+          <p class="work-desc">
+            気象庁の実データをもとに東京の週間天気予報表を Markdown で自動作成し、GitHub リポジトリへ自動コミット・Push するパイプラインを構築。
+          </p>
+          <div class="work-meta">
+            使用ツール: <span>Claude Code, GitHub CLI, Markdown</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── PROCESS ── -->
+<section id="process" style="padding-bottom: var(--xxl)">
+  <div class="container">
+    <hr class="divider-line">
+    <div style="padding-top: var(--xl);">
+      <div class="section-header reveal">
+        <p class="label">Process</p>
+        <h2>制作プロセス</h2>
+      </div>
+    </div>
+  </div>
+  <div class="container">
+    <div class="process-steps">
+      <div class="process-step reveal">
+        <div class="step-num">01</div>
+        <h3 class="step-title">課題定義</h3>
+        <p class="step-desc">自動化したいタスクを明確にし、期待する出力と制約条件を整理する。</p>
+      </div>
+      <div class="process-step reveal" style="transition-delay:60ms">
+        <div class="step-num">02</div>
+        <h3 class="step-title">プロンプト設計</h3>
+        <p class="step-desc">役割・手順・出力フォーマットを構造化し、再現性の高いプロンプトを設計する。</p>
+      </div>
+      <div class="process-step reveal" style="transition-delay:120ms">
+        <div class="step-num">03</div>
+        <h3 class="step-title">エージェント実装</h3>
+        <p class="step-desc">SubAgents・Skills・MCP ツールを組み合わせて自動化パイプラインを構築する。</p>
+      </div>
+      <div class="process-step reveal" style="transition-delay:180ms">
+        <div class="step-num">04</div>
+        <h3 class="step-title">結果検証</h3>
+        <p class="step-desc">出力の品質・達成率を評価し、プロンプトとフローを反復改善する。</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONTACT ── -->
+<section class="section-sm" id="contact">
+  <div class="container">
+    <div class="contact-inner reveal">
+      <div>
+        <p class="label">Contact</p>
+        <h2 class="contact-heading">お問い合わせ</h2>
+        <p style="margin-top: var(--sm); color: var(--text-sub); font-size: 15px;">
+          AI 自動化・エージェント開発のご相談はお気軽にどうぞ。
+        </p>
+      </div>
+      <div class="contact-actions">
+        <a href="mailto:toshimitsushin@gmail.com" class="btn btn-dark">メールを送る</a>
+        <a href="https://github.com/Toshi3-s" target="_blank" rel="noopener" class="btn btn-ghost">GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FOOTER ── -->
+<footer>
+  <div class="container">
+    <hr class="divider-line">
+    <div class="footer-inner" style="padding-top: var(--md);">
+      <span class="footer-logo">Toshi.</span>
+      <div class="footer-links">
+        <a href="#about">About</a>
+        <a href="#works">Works</a>
+        <a href="mailto:toshimitsushin@gmail.com">Contact</a>
+        <a href="https://github.com/Toshi3-s" target="_blank" rel="noopener">GitHub</a>
+      </div>
+      <span class="footer-copy">© 2026 Toshi. Built with Claude Code.</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // Nav scroll state
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 40);
+  }, { passive: true });
+
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.classList.add('visible');
+        observer.unobserve(e.target);
+      }
+    });
+  }, { threshold: 0.12 });
+  reveals.forEach(el => observer.observe(el));
+</script>
+</body>
+</html>

@@ -1,0 +1,289 @@
+# ============================================================
+# Design Prompt YAML — Editorial Bold / Dark Monochrome Style
+# 参考: liginc.co.jp のデザイン言語を抽象化
+# 用途: まったく別のサイト制作にそのまま流用可能
+# ============================================================
+
+meta:
+  style_name: "Editorial Bold Monochrome"
+  mood:
+    - bold          # 大胆・インパクト重視
+    - editorial     # 雑誌・メディア的な洗練
+    - minimal       # 要素を削ぎ落とした静けさ
+    - confident     # 自信と信頼感
+    - cinematic     # 映像的・没入感
+
+
+# ──────────────────────────────────────────
+# COLOR
+# ──────────────────────────────────────────
+color:
+  palette_strategy: "near-monochrome with one optional accent"
+
+  base:
+    background:     "#ffffff"   # ページ地：純白
+    surface:        "#f5f5f5"   # カード・セクション背景
+    overlay_dark:   "rgba(0,0,0,0.55)"  # 写真の上に重ねるダークベール
+
+  text:
+    primary:        "#0d0d0d"   # ほぼ黒。灰みがかった黒はNG
+    secondary:      "#5c5c5c"   # サブテキスト・キャプション
+    on_dark:        "#ffffff"   # ダーク背景上のテキスト
+
+  border:
+    default:        "#1a1a1a"   # 細い黒線（装飾・区切り）
+    subtle:         "#e0e0e0"   # 薄いグレー線
+
+  accent:
+    # モノクロベースを守るなら accent は null にする。
+    # 1色だけ使うなら黄・赤・青いずれか1色のみ許可。
+    use_accent:     false
+    color:          null        # 例: "#f5c518"（黄）など
+
+  hero_overlay:
+    type: "gradient"
+    value: "linear-gradient(to right, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.2) 100%)"
+    # 写真左側を暗くしテキストを読ませる
+
+
+# ──────────────────────────────────────────
+# TYPOGRAPHY
+# ──────────────────────────────────────────
+typography:
+  strategy: "少ない書体・強いウェイト差で階層をつくる"
+
+  font_family:
+    heading: "'Inter', 'Helvetica Neue', 'Hiragino Sans', sans-serif"
+    body:    "'Inter', 'Hiragino Kaku Gothic ProN', sans-serif"
+    label:   "inherit"  # 特別なフォントは使わない
+
+  font_weight:
+    hero:        900   # Black / Extra-Bold — 画面幅を埋める超太字
+    heading:     700   # Bold
+    subheading:  500   # Medium
+    body:        400   # Regular
+    caption:     400
+
+  font_size_scale:
+    # clamp(最小, 推奨, 最大) で流体スケール
+    hero:        "clamp(52px, 10vw, 120px)"   # 画面幅いっぱいに広がる見出し
+    h1:          "clamp(36px, 5vw, 64px)"
+    h2:          "clamp(24px, 3.5vw, 40px)"
+    h3:          "clamp(18px, 2.5vw, 24px)"
+    body:        "16px"
+    caption:     "12px"
+    label:       "11px"
+
+  letter_spacing:
+    hero:        "-0.03em"   # 大きい文字はネガティブトラッキング
+    heading:     "-0.02em"
+    label:       "0.12em"    # 小さい大文字ラベルはワイドトラッキング
+    body:        "0"
+
+  line_height:
+    hero:        1.0    # タイトで圧縮感
+    heading:     1.15
+    body:        1.75   # 本文は広めで読みやすく
+
+  text_transform:
+    hero_en:     "none"        # 英語見出しはそのまま（大文字化しない）
+    label:       "uppercase"   # セクションラベルは大文字
+
+
+# ──────────────────────────────────────────
+# LAYOUT & SPACING
+# ──────────────────────────────────────────
+layout:
+  max_width:       "1280px"
+  content_width:   "880px"     # テキストコンテンツの最大幅
+  gutter:          "40px"      # 左右余白（モバイルは 20px）
+
+  grid:
+    columns:       12
+    gap:           "24px"
+    breakpoints:
+      mobile:      "< 768px"
+      tablet:      "768px – 1024px"
+      desktop:     "> 1024px"
+
+  spacing_scale:
+    # 8px ベースの倍数
+    xs:   "8px"
+    sm:   "16px"
+    md:   "32px"
+    lg:   "64px"
+    xl:   "96px"
+    xxl:  "140px"
+
+  section_rhythm:
+    - type: "hero"
+      height: "100vh"          # 全画面
+      padding_top: "0"
+    - type: "content_section"
+      padding_y: "var(--xl)"   # 上下 96px
+    - type: "compact_section"
+      padding_y: "var(--lg)"   # 上下 64px
+
+
+# ──────────────────────────────────────────
+# COMPONENTS
+# ──────────────────────────────────────────
+components:
+
+  navigation:
+    position:      "fixed"
+    height:        "56px"
+    background:    "transparent → rgba(0,0,0,0.0) on scroll"
+    layout:        "3-column: [hamburger] [center-logo] [links]"
+    logo_style:    "bold logotype, centered, uppercase or short wordmark"
+    link_style:
+      color:       "var(--text-on-dark)"
+      font_weight: 500
+      font_size:   "14px"
+      underline:   "none"
+    border_bottom: "1px solid rgba(255,255,255,0.15)"
+    # ダーク写真上では白、白背景上では黒に切り替える
+
+  hero:
+    type:          "full-bleed photo with dark overlay + oversized text"
+    image:
+      position:    "cover"
+      overlay:     "var(--hero_overlay)"
+    text_position: "bottom-left or center-left"
+    heading_style:
+      size:        "var(--hero)"
+      weight:      900
+      color:       "#ffffff"
+      max_width:   "90%"       # ほぼ画面幅いっぱい
+    subtext:
+      size:        "16px"
+      color:       "rgba(255,255,255,0.80)"
+      margin_top:  "24px"
+    scroll_hint:   "丸いボタン（▶ または ↓）を右下に配置"
+
+  section_label:
+    # 各セクション冒頭の小さなラベル
+    style:         "uppercase, letter-spacing wide, small, colored with accent or muted"
+    size:          "var(--label)"
+    weight:        700
+    color:         "#5c5c5c"
+    margin_bottom: "8px"
+
+  card:
+    background:    "var(--surface)"
+    border:        "none"
+    border_radius: "0px"       # シャープ（角丸なし）
+    shadow:        "none"      # フラット。hover 時のみ軽い shadow
+    hover:
+      transform:   "translateY(-4px)"
+      shadow:      "0 12px 32px rgba(0,0,0,0.08)"
+      transition:  "0.2s ease"
+    image_ratio:   "16/10"
+    padding:       "20px 24px"
+
+  button:
+    primary:
+      background:  "#0d0d0d"
+      color:       "#ffffff"
+      border:      "none"
+      border_radius: "0px"     # 角丸なし — エディトリアルらしさ
+      padding:     "12px 28px"
+      font_size:   "14px"
+      font_weight: 600
+      hover:
+        background: "#ffffff"
+        color:      "#0d0d0d"
+        border:     "2px solid #0d0d0d"
+    outline:
+      background:  "transparent"
+      color:       "#0d0d0d"
+      border:      "1.5px solid #0d0d0d"
+      border_radius: "0px"
+      hover:
+        background: "#0d0d0d"
+        color:      "#ffffff"
+
+  divider:
+    style:         "1px solid #1a1a1a"
+    margin:        "0 var(--gutter)"
+
+  footer:
+    background:    "#0d0d0d"
+    color:         "#ffffff"
+    padding_y:     "var(--xl)"
+    layout:        "multi-column (3–4 cols on desktop, 1 col on mobile)"
+    font_size:     "13px"
+    link_color:    "rgba(255,255,255,0.65)"
+    link_hover:    "#ffffff"
+
+
+# ──────────────────────────────────────────
+# VISUAL RULES (守るべき原則)
+# ──────────────────────────────────────────
+visual_rules:
+  - "写真は必ず暗いオーバーレイで覆ってテキストを読ませる"
+  - "見出しは大きく・太く・行間を詰める。装飾より文字の迫力で魅せる"
+  - "ボーダーラジウスは 0 か 4px 以下。丸みを避けてシャープに保つ"
+  - "色数は最大3色（黒・白・グレー）。アクセントカラーを使う場合は1色のみ"
+  - "影はほぼ使わない。使う場合は hover 時のみ薄く"
+  - "余白は惜しまない。詰め込まずにブロック間を大きく空ける"
+  - "アニメーションは translate + opacity のみ。duration は 150–250ms"
+  - "モバイルでは見出しサイズを clamp で自動縮小する（手動 px 指定しない）"
+  - "セクションラベル（小さいUPPERCASE文字）で階層を示す"
+  - "ナビゲーションは要素数を最小限に（5項目以下）"
+
+
+# ──────────────────────────────────────────
+# ANIMATION / INTERACTION
+# ──────────────────────────────────────────
+animation:
+  philosophy: "控えめ・素早い。派手なアニメーションは不要"
+  defaults:
+    duration:    "200ms"
+    easing:      "ease"
+  scroll_reveal:
+    type:        "fade-in + translateY(20px) → translateY(0)"
+    trigger:     "IntersectionObserver (threshold: 0.15)"
+    stagger:     "60ms"        # カード複数枚のずれ
+  hover:
+    card:        "translateY(-4px), 200ms ease"
+    button:      "background-color swap, 150ms ease"
+    nav_link:    "opacity 0.7 → 1.0"
+
+
+# ──────────────────────────────────────────
+# CSS VARIABLES TEMPLATE
+# ──────────────────────────────────────────
+css_variables_template: |
+  :root {
+    /* Color */
+    --bg:            #ffffff;
+    --surface:       #f5f5f5;
+    --text:          #0d0d0d;
+    --text-sub:      #5c5c5c;
+    --text-on-dark:  #ffffff;
+    --border:        #1a1a1a;
+    --border-subtle: #e0e0e0;
+
+    /* Typography */
+    --font:          'Inter', 'Helvetica Neue', 'Hiragino Sans', sans-serif;
+    --hero-size:     clamp(52px, 10vw, 120px);
+    --h1-size:       clamp(36px, 5vw, 64px);
+    --h2-size:       clamp(24px, 3.5vw, 40px);
+    --body-size:     16px;
+    --label-size:    11px;
+
+    /* Spacing */
+    --xs:  8px;
+    --sm:  16px;
+    --md:  32px;
+    --lg:  64px;
+    --xl:  96px;
+    --xxl: 140px;
+    --gutter: 40px;
+    --max-w: 1280px;
+
+    /* Animation */
+    --duration: 200ms;
+    --ease: ease;
+  }
