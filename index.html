@@ -449,6 +449,14 @@
     }
     .footer-links a:hover { color: var(--text); }
 
+    /* ── HERO CANVAS ── */
+    #hero-canvas {
+      position: absolute; inset: 0;
+      width: 100%; height: 100%;
+      display: block;
+    }
+    .hero-bg { background: #06080f; }
+
     /* ── REVEAL ANIMATION ── */
     .reveal {
       opacity: 0;
@@ -491,7 +499,7 @@
 <!-- ── HERO ── -->
 <section class="hero" aria-label="ヒーローセクション">
   <div class="hero-bg">
-    <img src="img_yahoo_news.png" alt="">
+    <canvas id="hero-canvas"></canvas>
   </div>
   <div class="hero-overlay"></div>
 
@@ -733,6 +741,213 @@
 </footer>
 
 <script>
+/* ── HERO CANVAS ANIMATION ── */
+(function() {
+  const canvas = document.getElementById('hero-canvas');
+  const ctx = canvas.getContext('2d');
+
+  function resize() {
+    canvas.width  = canvas.offsetWidth  * devicePixelRatio;
+    canvas.height = canvas.offsetHeight * devicePixelRatio;
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+  }
+  resize();
+  window.addEventListener('resize', () => { resize(); initNodes(); });
+
+  const W = () => canvas.offsetWidth;
+  const H = () => canvas.offsetHeight;
+
+  /* ── NODES (neural net) ── */
+  const NODE_COUNT = 38;
+  let nodes = [];
+
+  function initNodes() {
+    nodes = Array.from({ length: NODE_COUNT }, () => ({
+      x: Math.random() * W(),
+      y: Math.random() * H(),
+      vx: (Math.random() - 0.5) * 0.28,
+      vy: (Math.random() - 0.5) * 0.28,
+      r: Math.random() * 2.2 + 1.0,
+      pulse: Math.random() * Math.PI * 2,
+    }));
+  }
+  initNodes();
+
+  /* ── TERMINAL LINES ── */
+  const TERMINAL_LINES = [
+    '> claude code run agent.py',
+    '✓ SubAgent #1 initialized',
+    '✓ SubAgent #2 initialized',
+    '→ Fetching news sources...',
+    '✓ 3 sites scraped (0.8s)',
+    '→ Running SEO analysis...',
+    '✓ Score: 87/100',
+    '→ Generating blog post...',
+    '✓ 5,024 chars  [99.3%]',
+    '→ Pushing to GitHub...',
+    '✓ Commit a7f3c2d pushed',
+    '> All tasks complete.',
+  ];
+
+  /* one line fades in every ~0.42s → full list ≈ 5s loop */
+  const LINE_INTERVAL = 5000 / TERMINAL_LINES.length;
+
+  /* ── FLOATING CODE TOKENS ── */
+  const TOKENS = [
+    'SubAgent', 'async def', 'await', 'prompt=', 'tool_use',
+    'anthropic', '.run()', 'yield', 'stream', 'JSON',
+    'POST /api', '200 OK', 'Claude', 'tokens:', 'model=',
+  ];
+  let floats = Array.from({ length: 14 }, (_, i) => ({
+    text: TOKENS[i % TOKENS.length],
+    x: Math.random() * 0.9 + 0.05,
+    y: Math.random() * 0.85 + 0.05,
+    alpha: Math.random() * 0.18 + 0.04,
+    speed: (Math.random() - 0.5) * 0.00008,
+    drift: (Math.random() - 0.5) * 0.00006,
+    size: Math.random() * 5 + 10,
+  }));
+
+  /* ── DRAW ── */
+  let start = null;
+
+  function draw(ts) {
+    if (!start) start = ts;
+    const t  = (ts - start) / 1000;          // seconds since start
+    const tl = (ts - start) % 5000 / 1000;   // 0–5s loop
+
+    const cw = W(), ch = H();
+    ctx.clearRect(0, 0, cw, ch);
+
+    /* background gradient */
+    const grad = ctx.createLinearGradient(0, 0, cw, ch);
+    grad.addColorStop(0, '#06080f');
+    grad.addColorStop(1, '#0d1220');
+    ctx.fillStyle = grad;
+    ctx.fillRect(0, 0, cw, ch);
+
+    /* ── update nodes ── */
+    nodes.forEach(n => {
+      n.x += n.vx; n.y += n.vy;
+      if (n.x < 0 || n.x > cw) n.vx *= -1;
+      if (n.y < 0 || n.y > ch) n.vy *= -1;
+      n.pulse += 0.018;
+    });
+
+    /* ── draw edges ── */
+    const LINK_DIST = Math.min(cw, ch) * 0.24;
+    ctx.lineWidth = 0.6;
+    for (let i = 0; i < nodes.length; i++) {
+      for (let j = i + 1; j < nodes.length; j++) {
+        const dx = nodes[i].x - nodes[j].x;
+        const dy = nodes[i].y - nodes[j].y;
+        const d  = Math.sqrt(dx*dx + dy*dy);
+        if (d < LINK_DIST) {
+          const a = (1 - d / LINK_DIST) * 0.22;
+          ctx.strokeStyle = `rgba(100,180,255,${a})`;
+          ctx.beginPath();
+          ctx.moveTo(nodes[i].x, nodes[i].y);
+          ctx.lineTo(nodes[j].x, nodes[j].y);
+          ctx.stroke();
+        }
+      }
+    }
+
+    /* ── draw nodes ── */
+    nodes.forEach(n => {
+      const glow = Math.sin(n.pulse) * 0.5 + 0.5;
+      const r = n.r + glow * 1.2;
+      const g = ctx.createRadialGradient(n.x, n.y, 0, n.x, n.y, r * 3);
+      g.addColorStop(0, `rgba(120,200,255,${0.55 + glow * 0.3})`);
+      g.addColorStop(1, 'rgba(120,200,255,0)');
+      ctx.fillStyle = g;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r * 3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.fillStyle = `rgba(200,235,255,${0.75 + glow * 0.2})`;
+      ctx.beginPath();
+      ctx.arc(n.x, n.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    /* ── floating code tokens ── */
+    ctx.font = '13px "Courier New", monospace';
+    floats.forEach(f => {
+      f.x = ((f.x + f.speed + 1) % 1);
+      f.y = ((f.y + f.drift + 1) % 1);
+      const fade = 0.5 + 0.5 * Math.sin(t * 0.7 + f.x * 10);
+      ctx.fillStyle = `rgba(100,200,255,${f.alpha * fade})`;
+      ctx.fillText(f.text, f.x * cw, f.y * ch);
+    });
+
+    /* ── terminal panel ── */
+    const pw = Math.min(cw * 0.38, 380);
+    const ph = 26 * TERMINAL_LINES.length + 32;
+    const px = cw - pw - Math.max(cw * 0.04, 24);
+    const py = ch * 0.5 - ph * 0.5;
+
+    /* panel bg */
+    ctx.fillStyle = 'rgba(8,14,28,0.72)';
+    ctx.strokeStyle = 'rgba(100,180,255,0.18)';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.roundRect(px, py, pw, ph, 6);
+    ctx.fill();
+    ctx.stroke();
+
+    /* traffic lights */
+    [['#ff5f57',px+14], ['#febc2e',px+30], ['#28c840',px+46]].forEach(([c,x]) => {
+      ctx.fillStyle = c;
+      ctx.beginPath();
+      ctx.arc(x, py + 14, 4.5, 0, Math.PI * 2);
+      ctx.fill();
+    });
+
+    /* terminal text */
+    ctx.font = `12px "Courier New", monospace`;
+    TERMINAL_LINES.forEach((line, i) => {
+      /* each line fades in sequentially, then stays visible */
+      const lineStart = i * LINE_INTERVAL / 1000;  /* in loop-seconds */
+      let alpha = 0;
+      if (tl >= lineStart) {
+        const age = tl - lineStart;
+        alpha = Math.min(age / 0.25, 1);           /* 0.25s fade-in */
+      }
+      if (alpha <= 0) return;
+
+      /* colour: prompt → cyan, check → green, arrow → yellow, default → dim */
+      let col;
+      if (line.startsWith('>'))       col = `rgba(200,240,255,${alpha})`;
+      else if (line.startsWith('✓'))  col = `rgba(100,230,140,${alpha})`;
+      else if (line.startsWith('→'))  col = `rgba(255,210,80,${alpha})`;
+      else                            col = `rgba(160,200,240,${alpha * 0.75})`;
+
+      ctx.fillStyle = col;
+      ctx.fillText(line, px + 14, py + 32 + i * 26);
+
+      /* blinking cursor on the last visible line */
+      const isLast = (i === TERMINAL_LINES.length - 1) ||
+                     (tl < (i + 1) * LINE_INTERVAL / 1000);
+      if (isLast && Math.floor(t * 2) % 2 === 0) {
+        const tw = ctx.measureText(line).width;
+        ctx.fillStyle = `rgba(200,240,255,${alpha})`;
+        ctx.fillRect(px + 14 + tw + 2, py + 32 + i * 26 - 11, 7, 13);
+      }
+    });
+
+    /* ── scanline overlay ── */
+    ctx.fillStyle = 'rgba(0,0,0,0.03)';
+    for (let y = 0; y < ch; y += 4) {
+      ctx.fillRect(0, y, cw, 2);
+    }
+
+    requestAnimationFrame(draw);
+  }
+
+  requestAnimationFrame(draw);
+})();
+
+/* ── NAV SCROLL STATE ── */
   // Nav scroll state
   const nav = document.getElementById('nav');
   window.addEventListener('scroll', () => {
